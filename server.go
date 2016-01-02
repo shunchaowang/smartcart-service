@@ -4,15 +4,16 @@ import (
 	// standard library packages
 	"fmt"
 	"net/http"
+	"database/sql"
 
 	// third party packages
-	"github.com/julienschmidt/httprouter"
-	//zencartcontroller "github.com/shunchaowang/zencart-service/controller"
-	//"gopkg.in/mgo.v2"
+    "github.com/julienschmidt/httprouter"
+    _ "github.com/go-sql-driver/mysql"
+    "gopkg.in/mgo.v2"
+    //zencartcontroller "github.com/shunchaowang/zencart-service/controller"
 
-	// project scope packages
-	"github.com/shunchaowang/smartcart-service/controller"
-	"github.com/shunchaowang/smartcart-service/util"
+    // project scope packages
+    "github.com/shunchaowang/smartcart-service/controller"
 )
 
 func main() {
@@ -55,7 +56,7 @@ func main() {
 // TODO: TBD
 func handler(w http.ResponseWriter, r *http.Request) {
 	// check api key
-	ac := controller.NewApiController(util.GetMongoSession())
+	ac := controller.NewApiController(getMongoSession())
 	if !ac.Authorize(r) {
 		w.WriteHeader(403) // Forbidden
 	}
@@ -67,7 +68,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func authorize(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		fmt.Println(*r.URL)
-		ac := controller.NewApiController(util.GetMongoSession())
+		ac := controller.NewApiController(getMongoSession())
 		if !ac.Authorize(r) {
 			w.WriteHeader(403)
 			return
@@ -76,3 +77,26 @@ func authorize(fn httprouter.Handle) httprouter.Handle {
 	}
 }
 
+// Create a new mongo session and panics if connection error occurs
+func getMongoSession() *mgo.Session {
+	// Connect to our local mongo
+	s, err := mgo.Dial("mongodb://localhost")
+
+	// Check if connection fails, is mongo running?
+	if err != nil {
+		panic(err)
+	}
+
+	// Deliver session
+	return s
+}
+
+func getZencartDB() *sql.DB {
+	db, err := sql.Open("mysql", "zencart:zencart@tcp(localhost:3306)/zencart?charset=utf8")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
