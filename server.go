@@ -2,18 +2,18 @@ package main
 
 import (
 	// standard library packages
+	"database/sql"
 	"fmt"
 	"net/http"
-	"database/sql"
 
 	// third party packages
-    "github.com/julienschmidt/httprouter"
-    _ "github.com/go-sql-driver/mysql"
-    "gopkg.in/mgo.v2"
-    //zencartcontroller "github.com/shunchaowang/zencart-service/controller"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/julienschmidt/httprouter"
+	"gopkg.in/mgo.v2"
+	//zencartcontroller "github.com/shunchaowang/zencart-service/controller"
 
-    // project scope packages
-    "github.com/shunchaowang/smartcart-service/controller"
+	// project scope packages
+	"github.com/shunchaowang/smartcart-service/controller"
 )
 
 func main() {
@@ -21,9 +21,9 @@ func main() {
 	// Http request should contain a hreader with authorization: Bearer <uid>
 	// Server will check uid against backend mongo db
 	// instantiate a new router
-    // two routers listen on different ports
+	// two routers listen on different ports
 	zencartrouter := httprouter.New()
-    magentorouter := httprouter.New()
+	magentorouter := httprouter.New()
 
 	// /zencart will be routed to zencart service
 	// /magento will be routed to magento service
@@ -34,20 +34,20 @@ func main() {
 
 	// get a product
 	zencartrouter.GET("/zencart", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-        w.Write([]byte("Listening on zencart."))
-    })
+		w.Write([]byte("Listening on zencart."))
+	})
 
 	magentorouter.GET("/magento", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-        w.Write([]byte("Listening on magento."))
-    })
+		w.Write([]byte("Listening on magento."))
+	})
 
 	// create a product
 
 	// delete a product
 
-    go func() {
-        http.ListenAndServe("localhost:8081", magentorouter)
-    }()
+	go func() {
+		http.ListenAndServe("localhost:8081", magentorouter)
+	}()
 
 	// fire up the server
 	http.ListenAndServe("localhost:8080", zencartrouter)
