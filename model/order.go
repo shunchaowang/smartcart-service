@@ -1,26 +1,28 @@
 package model
 
+import (
+    "time"
+)
+
 type (
-	Product struct {
+	Order struct {
 		Id       int     `json:"id"`
-		Model    string  `json:"model"`
-		Quantity int     `json:"quantity"`
-		Image    string  `json:"image"`
-		Price    float32 `json:"price"`
+		Amount    float32 `json:"amount"`
+        Remark string `json:"remark"`
 
-		Weight float32 `json:"weight"`
+        CreatedTime time.Time `json:"createdTime"`
+        UpdatedTime time.Time `json:"updatedTime"`
 
-		Name        string `json:"name"`
-		Description string `json:"description"`
+        OrderStatus OrderStatus `json:"status"`
+        Customer Customer `json:'customer'`
+        Products []Product `json:"products"`
 
-		Category Category `json:"category"`
+        ShippingAddress Address `json:'address'`
 	}
 
-	Category struct {
-		Id    int    `json:"id"`
-		Image string `json:"image"`
+    OrderStatus struct {
+        Id int `json:"id"`
+        Name string `json:"name"`
+    }
 
-		Name        string `json:"name"`
-		Description string `json:"description"`
-	}
 )
